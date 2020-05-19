@@ -9,8 +9,26 @@ class CarService {
     void CheckOut();
     void Admin();
     void Employee();
+    void AlreadyCust();
+    void NewCust();
+    void RTHP();
+    void NewComplain();
+    void ServiceHistory();
+    void Submit();
 
 };
+void CarService::CheckIn() {
+    
+    cout << "1. Already Customer\n2. New Customer\n3. Return to Home Page\n";
+    cout << "Enter your choice: ";
+    int choice;
+    cin >> choice;
+    switch(choice)
+    {
+    case 1: AlreadyCust();
+        break;
+    case 2: 
+
 int main()
 {
     
