@@ -2,10 +2,18 @@
 //
 
 #include <iostream>
+using namespace std;
 
+class CarService {
+    void  CheckIn();
+    void CheckOut();
+    void Admin();
+    void Employee();
+
+};
 int main()
 {
-    std::cout << "Hello BC!\n";
+    
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
