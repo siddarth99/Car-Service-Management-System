@@ -111,6 +111,8 @@ void CarService::Admin() {
 
 
 void CarService::Employee() {
+	int pos = 0;
+	string date, time, VehicleNo, Issues, status;
 	fstream AdminFile;
 	AdminFile.open("Admin.txt", ios::in);
 	string userName,usern_file, password, buffer, passw_file,status;
@@ -152,6 +154,42 @@ void CarService::Employee() {
 	if (passw_file == password)
 	{
 		cout << "login Successfull";
+		IssuesDetails.open("IssuesDetails.txt", ios::in);
+		while (!IssuesDetails.eof())
+		{
+		buffer.erase();
+		pos = IssuesDetails.tellg();
+		getline(IssuesDetails, buffer);
+		int ch = 1, i = 0;
+		date.erase();
+		while (buffer[i] != '|')
+			date += buffer[i++];
+
+		time.erase();
+		i++;
+		while (buffer[i] != '|')
+			time += buffer[i++];
+		VehicleNo.erase();
+		i++;
+		while (buffer[i] != '|')
+			VehicleNo += buffer[i++];
+		Issues.erase();
+		i++;
+		while (buffer[i] != '|')
+			Issues += buffer[i++];
+		status.erase();
+		i++;
+		while (buffer[i] != '&')
+				status += buffer[i++];
+		if (status == "0")
+		{
+			
+			cout << date << "|" << time << "|" << VehicleNo << "|" << Issues << "&";
+
+
+		}
+		}
+
 	}
 	else {
 		cout << "login not successfull";
