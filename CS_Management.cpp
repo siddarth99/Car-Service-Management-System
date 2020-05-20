@@ -18,12 +18,12 @@ public:
 	void Employee();
 	void AlreadyCust();
 	void NewCust();
-	
+
 	void NewComplain();
 	void ServiceHistory();
 	void Submit();
 	void Issues(string);
-	
+
 
 };
 void CarService::CheckIn() {
@@ -38,8 +38,8 @@ void CarService::CheckIn() {
 		break;
 	case 2: NewCust();
 		break;
-		case 3: HomePage();
-			break;
+	case 3: HomePage();
+		break;
 	}
 }
 
@@ -85,19 +85,17 @@ void CarService::Admin() {
 	password = mystdhash(password);
 	if (!AdminFile.is_open()) {
 		AdminFile.open("Admin.txt", ios::out);
-		AdminFile << userName << "|" << password << "$";
-		cout << userName << password;
+		AdminFile << userName << "|" << password <<"|"<<"1"<< "$";
 
 	}
 	else {
-
 		buffer.erase();
 		int i = 0;
 		getline(AdminFile, buffer);
 		while (buffer[i] != '|')
 			userName += buffer[i++];
 		i++;
-		while (buffer[i] != '$')
+		while (buffer[i] != '|')
 			passw += buffer[i++];
 		if (passw == password)
 		{
@@ -113,11 +111,52 @@ void CarService::Admin() {
 
 
 void CarService::Employee() {
-	fstream EmployeeFile;
-	EmployeeFile.open("Employee.txt", ios::in);
-	string EmployeeID, Password;
-	cout << "Enter the Employee ID : ";
+	fstream AdminFile;
+	AdminFile.open("Admin.txt", ios::in);
+	string userName,usern_file, password, buffer, passw_file,status;
+	usern_file = "null";
+	cout << "Enter Username: ";
+	cin >> userName;
+	cout << "Enter Password: ";
+	HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+	DWORD mode = 0;
+	GetConsoleMode(hStdin, &mode);
+	SetConsoleMode(hStdin, mode & (~ENABLE_ECHO_INPUT));
+	cin.ignore();
+	getline(cin, password);
+	SetConsoleMode(hStdin, mode);
+	hash<string> mystdhash;
+	password = mystdhash(password);
+	buffer.erase();
+	int i = 0;
+	getline(AdminFile, buffer);
 
+	while (usern_file!=userName )
+	{
+		usern_file.erase();
+		while (buffer[i] != '|')
+			usern_file += buffer[i++];
+		i++;
+		cout << usern_file;
+		passw_file.erase();
+		while (buffer[i] != '|')
+			passw_file+= buffer[i++];
+		i++;
+		status.erase();
+		while (buffer[i] != '$')
+			status += buffer[i++];
+		if (AdminFile.eof()) {
+			break;
+		}
+	}
+	if (passw_file == password)
+	{
+		cout << "login Successfull";
+	}
+	else {
+		cout << "login not successfull";
+		Employee();
+	}
 
 }
 
@@ -134,22 +173,22 @@ void CarService::AlreadyCust() {
 		buffer.erase();
 		pos = CustomerDetails.tellg();
 		getline(CustomerDetails, buffer);
-		int ch = 1, i = 0; 
+		int ch = 1, i = 0;
 		name.erase();
 		while (buffer[i] != '|')
 			name += buffer[i++];
-		
-		PhoneNumber.erase(); 
-		i++; 
-		while (buffer[i] != '|') 
+
+		PhoneNumber.erase();
+		i++;
+		while (buffer[i] != '|')
 			PhoneNumber += buffer[i++];
 		VehicleNo.erase();
 		i++;
 		while (buffer[i] != '$')
 			VehicleNo += buffer[i++];
 
-		
-		if (VehicleNo ==key )
+
+		if (VehicleNo == key)
 		{
 			cout << "\nFound the Vehicle Number.\n" << buffer;
 			flag = 1;
@@ -170,7 +209,7 @@ void CarService::AlreadyCust() {
 				}
 
 			}
-			else{
+			else {
 				AlreadyCust();
 			}
 
@@ -181,7 +220,7 @@ void CarService::AlreadyCust() {
 		}
 
 	}
-	
+
 }
 void CarService::NewCust() {
 	string confirm;
@@ -198,10 +237,10 @@ void CarService::NewCust() {
 	cout << name << " " << phNumber << " " << vehicleNo << endl;
 	cout << "Do you want to Confirm?(Y/N)";
 	cin >> confirm;
-	
+
 	if (confirm == "y" || "Y") {
 
-		CustomerFile << name << "|" << phNumber << "|" << vehicleNo <<"$"<< endl;
+		CustomerFile << name << "|" << phNumber << "|" << vehicleNo << "$" << endl;
 
 		CustomerFile.close();
 
@@ -215,13 +254,13 @@ void CarService::ServiceHistory() {
 
 }
 void CarService::Issues(string vehicle_numb) {
-	int status=0;
-	string issues,wax_wash,confirm;
+	int status = 0;
+	string issues, wax_wash, confirm;
 	SYSTEMTIME st;
 	GetSystemTime(&st);
 
 
-	ofstream CarIssues("IssuesDetails.txt",ios::app);
+	ofstream CarIssues("IssuesDetails.txt", ios::app);
 	cout << "Enter the Issues in your Vehicle:";
 	cin.ignore();
 	getline(cin, issues);
@@ -235,9 +274,8 @@ void CarService::Issues(string vehicle_numb) {
 	cin >> confirm;
 	if (confirm == "y" || "Y") {
 
+		CarIssues << st.wDay << "/" << st.wMonth << "/" << st.wYear << " " << st.wHour << ":" << st.wMinute << " " << vehicle_numb << " " << issues << status << endl;
 
-		CarIssues << st.wDay << "/" << st.wMonth << "/" << st.wYear << " " << st.wHour << ":" << st.wMinute << " " << vehicle_numb << " " << issues <<status<< endl;
-		
 		CarIssues.close();
 	}
 	else {
