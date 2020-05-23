@@ -19,15 +19,15 @@ public:
 	void NewCust();
 	string IssuesSearch(string);
 	void IssuesDelete(string);
-	void StatusUpdate(string,string);
+	void StatusUpdate(string, string);
 	void NewComplain();
 	void ServiceHistory();
 	void Submit();
 	void Issues(string);
-
-
-
 };
+
+
+
 void CarService::CheckIn() {
 
 	cout << "1. Already Customer\n2. New Customer\n3. Return to Home Page\n";
@@ -62,6 +62,7 @@ void CarService::HomePage() {
 		break;
 	case 5: exit;
 	}
+	
 
 }
 
@@ -113,7 +114,7 @@ void CarService::Admin() {
 
 
 void CarService::Employee() {
-	int pos = 0;
+	int pos = 0, flag = 0;
 	string date, time, VehicleNo, Issues, status1, key;
 	fstream AdminFile;
 	AdminFile.open("Admin.txt", ios::in);
@@ -158,44 +159,65 @@ void CarService::Employee() {
 		int i = 0;
 		fstream IssuesDetails;
 		cout << "login Successfull\n";
-		IssuesDetails.open("IssuesDetails.txt", ios::in||ios::out);
-		while (!IssuesDetails.eof())
+		IssuesDetails.open("IssuesDetails.txt", ios::in);
+		if (IssuesDetails.peek() == std::ifstream::traits_type::eof())
 		{
-		
-			buffer.erase();
-			pos = IssuesDetails.tellg();
-			getline(IssuesDetails, buffer);
-			
-			
-			i = 0;
-			date.erase();
-			if (!getline(IssuesDetails, buffer))
-				break;
+			cout << "There are no Vehicle for Service\n";
+			HomePage();
 
-			while (buffer[i] != '|')
-				date += buffer[i++];
-			time.erase();
-			i++;
-			while (buffer[i] != '|')
-				time += buffer[i++];
-			VehicleNo.erase();
-			i++;
-			while (buffer[i] != '|')
-				VehicleNo += buffer[i++];
-			Issues.erase();
-			i++;
-			while (buffer[i] != '|')
-				Issues += buffer[i++];
-			status.erase();
-			i++;
-			while (buffer[i] != '$')
-				status += buffer[i++];
-			if (status == "0")
+		}
+		else 
+		{
+			while (!IssuesDetails.eof())
 			{
-				cout << date << "|" << time << "|" << VehicleNo << "|" << Issues << "$"<<endl;
+				
+				buffer.erase();
+				pos = IssuesDetails.tellg();
+				i = 0;
+				date.erase();
+				if (!getline(IssuesDetails, buffer))
+					break;
+				while (buffer[i] != '|')
+					date += buffer[i++];
+				time.erase();
+				i++;
+				while (buffer[i] != '|')
+					time += buffer[i++];
+				VehicleNo.erase();
+				i++;
+				while (buffer[i] != '|')
+					VehicleNo += buffer[i++];
+				Issues.erase();
+				i++;
+				while (buffer[i] != '|')
+					Issues += buffer[i++];
+				status.erase();
+				i++;
+				while (buffer[i] != '$')
+					status += buffer[i++];
+				if (status == "0")
+				{
+					cout << date << "|" << time << "|" << VehicleNo << "|" << Issues << "$" << endl;
+					flag = 1;
+				}
 
 			}
+			
+			
+		
+			
 		}
+		if (flag == 0)
+		{
+			cout<<"All the Vehicles are under Service";
+		}
+		else
+		{
+			cout << "Enter the vehicle number to select the vehicle:";
+			cin >> key;
+			StatusUpdate(key, "1");
+		}
+		
 
 	}
 	else
@@ -203,15 +225,13 @@ void CarService::Employee() {
 		cout << "login not successfull  ";
 		Employee();
 	}
-	cout << "Enter the vehicle number to select the vehicle:";
-	cin >> key;
-	StatusUpdate(key, "1");
-		
+	
+
 }
 
 void CarService::AlreadyCust() {
 	int flag = 0, pos = 0, choice;
-	string VehicleNo, name, key, confirm,buffer;
+	string VehicleNo, name, key, confirm, buffer;
 	string PhoneNumber;
 	cout << "Enter your Vehicle Number: " << endl;
 	cin >> key;
@@ -227,6 +247,7 @@ void CarService::AlreadyCust() {
 		name.erase();
 		while (buffer[i] != '|')
 			name += buffer[i++];
+
 
 		PhoneNumber.erase();
 		i++;
@@ -273,45 +294,7 @@ void CarService::AlreadyCust() {
 
 }
 
-void CarService::StatusUpdate(string key, string status1) {
 
-	string buffr,key1;
-	int flag = 0, pos = 0, i=0, choice;
-	string date, time, VehicleNo, Issues, status;
-	buffr.erase();
-	buffr = IssuesSearch(key);
-	cout << buffr;
-	cout << "search buffer";
-	if (buffr == "NULL")
-	{
-		cout << "Vehicle NOT FOUND \nEnter Vehicle Number again";
-		cin >> key1;
-		StatusUpdate(key1, status1);
-	}
-	IssuesDelete(key);
-	while (buffr[i] != '|')
-		date += buffr[i++];
-	time.erase();
-	i++;
-	while (buffr[i] != '|')
-		time += buffr[i++];
-	VehicleNo.erase();
-	i++;
-	while (buffr[i] != '|')
-		VehicleNo += buffr[i++];
-	Issues.erase();
-	i++;
-	while (buffr[i] != '|')
-		Issues += buffr[i++];
-	status.erase();
-	i++;
-	while (buffr[i] != '$')
-		status += buffr[i++];
-	status = status1;
-	fstream IssuesDetails("IssuesDetails.txt",ios::app);
-	IssuesDetails << date<< "|" << time<< "|" << VehicleNo << "|"  << Issues <<"|"<< status << "$" << endl;
-	IssuesDetails.close();
-}
 
 void CarService::NewCust() {
 	string confirm;
@@ -367,7 +350,7 @@ void CarService::Issues(string vehicle_numb) {
 
 		CarIssues << st.wDay << "/" << st.wMonth << "/" << st.wYear << "|" << st.wHour << ":" << st.wMinute << "|" << vehicle_numb << "|" << issues << "|" << status << "$" << endl;
 
-	CarIssues.close();
+		CarIssues.close();
 	}
 	else {
 		Issues(vehicle_numb);
@@ -377,7 +360,7 @@ void CarService::Issues(string vehicle_numb) {
 
 string CarService::IssuesSearch(string key) {
 	int flag = 0, pos = 0, i, choice;
-	string date, time, VehicleNo, Issues, status,buffer;
+	string date, time, VehicleNo, Issues, status, buffer;
 	string PhoneNumber;
 	ifstream IssuesDetails;
 	IssuesDetails.open("IssuesDetails.txt", ios::in);
@@ -409,58 +392,104 @@ string CarService::IssuesSearch(string key) {
 		while (buffer[i] != '$')
 			status += buffer[i++];
 
-		if (VehicleNo == key)
+		if (VehicleNo == key && status == "0")
+		{
 			IssuesDetails.close();
-
 			return buffer;
+		}
 	}
 	IssuesDetails.close();
 	return "NULL";
 }
 
+void CarService::StatusUpdate(string key, string status1) {
+
+	string buffr, key1;
+	int flag = 0, pos = 0, i = 0, choice;
+	string date, time, VehicleNo, Issues, status;
+	buffr.erase();
+	buffr = IssuesSearch(key);
+	
+	
+	if (buffr == "NULL")
+	{
+		cout << "Vehicle NOT FOUND \nEnter Vehicle Number again :";
+		cin >> key1;
+		StatusUpdate(key1, status1);
+	}
+	else
+	{
+		IssuesDelete(key);
+		while (buffr[i] != '|')
+			date += buffr[i++];
+		time.erase();
+		i++;
+		while (buffr[i] != '|')
+			time += buffr[i++];
+		VehicleNo.erase();
+		i++;
+		while (buffr[i] != '|')
+			VehicleNo += buffr[i++];
+		Issues.erase();
+		i++;
+		while (buffr[i] != '|')
+			Issues += buffr[i++];
+		status.erase();
+		i++;
+		while (buffr[i] != '$')
+			status += buffr[i++];
+		status.erase();
+		status = status1;
+
+		fstream IssuesDetails("IssuesDetails.txt", ios::app);
+		IssuesDetails.seekp(0, ios::beg);
+		IssuesDetails << date << "|" << time << "|" << VehicleNo << "|" << Issues << "|" << status << "$" << endl;
+		IssuesDetails.close();
+	}
+}
+
 void CarService::IssuesDelete(string key) {
-	string buff;
-	int pos = 0,i=0;
+
+	int pos = 0, i = 0;
 	string date, time, VehicleNo, Issues, status, buffer;
 	fstream temp("temp.txt", ios::out);
-	buff = IssuesSearch(key);
-	if (buff == "NULL") {
+	buffer = IssuesSearch(key);
+	if (buffer == "NULL") {
 		cout << "Vehicle NOT FOUND";
 	}
-	
 	else {
-
 		fstream IssuesDetails;
 		IssuesDetails.open("IssuesDetails.txt", ios::in);
 		while (!IssuesDetails.eof())
 		{
-			cout << "INwhile";
+			
 			buffer.erase();
 			if (!getline(IssuesDetails, buffer))
 				break;
-
-			
 			pos = IssuesDetails.tellg();
-			
 			i = 0;
 			date.erase();
-		
+
 			while (buffer[i] != '|')
 				date += buffer[i++];
 			time.erase();
 			i++;
+
 			while (buffer[i] != '|')
 				time += buffer[i++];
 			VehicleNo.erase();
 			i++;
+
 			while (buffer[i] != '|')
 				VehicleNo += buffer[i++];
 			Issues.erase();
 			i++;
+
 			while (buffer[i] != '|')
 				Issues += buffer[i++];
 			status.erase();
 			i++;
+
 			while (buffer[i] != '$')
 				status += buffer[i++];
 
@@ -472,36 +501,34 @@ void CarService::IssuesDelete(string key) {
 		}
 		IssuesDetails.close();
 		temp.close();
-		temp.open("temp.txt");
+		temp.open("temp.txt", ios::in);
 		remove("IssuesDetails.txt");
 		fstream IssuesDetails1;
-		IssuesDetails1.open("IssuesDetails.txt",ios::app);
+		IssuesDetails1.open("IssuesDetails.txt", ios::out);
+		string text;
 		if (IssuesDetails1.is_open()) {
 			while (!temp.eof()) {
 				buffer.erase();
-				getline(temp, buffer);
-				cout << buffer;
-				IssuesDetails1 << buffer << endl;
+				if (!getline(temp, buffer))
+					break;
+				text += buffer + "\n";
 			}
+			IssuesDetails1 << text;
 			IssuesDetails1.close();
-
 			temp.close();
 		}
 		else {
-			cout << "file ainr open";
+			cout << "file aint open";
 		}
-		
 	}
-	
 }
 
 
 int main()
 {
-	
 	CarService cs;
-	//cs.HomePage();
+	cs.HomePage();
 	//cs.IssuesDelete("ka19");
 	//cout<<cs.IssuesSearch("ka19");
-	cs.StatusUpdate("ka19", "1");
+	//cs.StatusUpdate("ka19", "1");
 }
