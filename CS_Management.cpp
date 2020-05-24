@@ -13,6 +13,8 @@ public:
 	void CheckIn();
 	void CheckOut();
 	void Admin();
+	void Employee_Delete(string);
+	string Employee_search(string);
 	void Employee();
 	void AlreadyCust();
 	void NewCust();
@@ -144,10 +146,17 @@ void CarService::Admin() {
 				cout << "Enter Employee Salary" << endl;
 				cin >> salary;
 				status2 = "0";
-				Employee << st.wDay << "/" << st.wMonth << "/" << st.wYear << "|" << employee_name <<"|"<<employee_id<< "|" << employee_position << "|" << salary << "|" << status2 << endl;
+				Employee << st.wDay << "/" << st.wMonth << "/" << st.wYear << "|" << employee_name <<"|"<<employee_id<< "|" << employee_position << "|" << salary << "|" << status2<<"$" << endl;
 				Employee.close();
 				AdminFile.open("Admin.txt", ios::app);
 				AdminFile << employee_id<<"|" << pass<<"$"<<endl;
+			}
+			else if (choice == 2) {
+				cout << "\n";
+				cout << "Enter Employee ID\n";
+				cin >> employee_id;
+
+
 			}
 		}
 		else {
@@ -156,6 +165,139 @@ void CarService::Admin() {
 		}
 	}
 }
+
+string CarService::Employee_search(string key)
+{
+	int flag = 0, pos = 0, i, choice;
+	string date, employee_name, employee_id, position, salary, status, buffer;
+	string PhoneNumber;
+	ifstream Employee;
+	Employee.open("Employee.txt", ios::in);
+	while (!Employee.eof())
+	{
+		buffer.erase();
+		if (!getline(Employee, buffer))
+			break;
+		pos = Employee.tellg();
+		i = 0;
+		date.erase();
+
+		while (buffer[i] != '|')
+			date += buffer[i++];
+		employee_name.erase();
+		i++;
+
+		while (buffer[i] != '|')
+			employee_name += buffer[i++];
+		employee_id.erase();
+		i++;
+
+		while (buffer[i] != '|')
+			employee_id += buffer[i++];
+		position.erase();
+		i++;
+
+		while (buffer[i] != '|')
+			position += buffer[i++];
+		salary.erase();
+		i++;
+
+		while (buffer[i] != '|')
+			salary += buffer[i++];
+		status.erase();
+		i++;
+		while (buffer[i] != '$')
+			status += buffer[i++];
+
+		if (employee_id == key)
+		{
+			Employee.close();
+			return buffer;
+		}
+	}
+	Employee.close();
+	return "NULL";
+}
+
+void CarService::Employee_Delete(string key)
+{
+	int pos = 0, i = 0;
+	string date, employee_name, employee_id, position,salary, status, buffer;
+	fstream temp("temp.txt", ios::out);
+	buffer = Employee_search(key);
+	if (buffer == "NULL") {
+		cout << "Vehicle NOT FOUND";
+	}
+	else {
+		fstream Employee;
+		Employee.open("Employee.txt", ios::in);
+		while (!Employee.eof())
+		{
+			buffer.erase();
+			if (!getline(Employee, buffer))
+				break;
+			pos = Employee.tellg();
+			i = 0;
+			date.erase();
+
+			while (buffer[i] != '|')
+				date += buffer[i++];
+			employee_name.erase();
+			i++;
+
+			while (buffer[i] != '|')
+				employee_name += buffer[i++];
+			employee_id.erase();
+			i++;
+
+			while (buffer[i] != '|')
+				employee_id += buffer[i++];
+			position.erase();
+			i++;
+
+			while (buffer[i] != '|')
+				position+= buffer[i++];
+			salary.erase();
+			i++;
+
+			while (buffer[i] != '|')
+				salary += buffer[i++];
+			status.erase();
+			i++;
+			while (buffer[i] != '$')
+				status += buffer[i++];
+
+			if (employee_id == key)
+				continue;
+			else {
+				temp << buffer << endl;
+			}
+		}
+		Employee.close();
+		temp.close();
+		temp.open("temp.txt", ios::in);
+		remove("Employee.txt");
+		fstream IssuesDetails1;
+		IssuesDetails1.open("Employee.txt", ios::out);
+		string text;
+		if (IssuesDetails1.is_open()) {
+			while (!temp.eof()) {
+				buffer.erase();
+				if (!getline(temp, buffer))
+					break;
+				text += buffer + "\n";
+			}
+			IssuesDetails1 << text;
+			IssuesDetails1.close();
+			temp.close();
+		}
+		else {
+			cout << "file aint open";
+		}
+	}
+}
+
+
 
 
 
@@ -545,8 +687,10 @@ void CarService::IssuesDelete(string key) {
 int main()
 {
 	CarService cs;
-	cs.HomePage();
+	//cs.HomePage();
 	//cs.IssuesDelete("ka19");
 	//cout<<cs.IssuesSearch("ka19");
 	//cs.StatusUpdate("ka19", "1");
+	//cout<<cs.Employee_search("sid11
+	cs.Employee_Delete("sid11");
 }
