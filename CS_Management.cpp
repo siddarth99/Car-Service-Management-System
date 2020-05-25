@@ -22,10 +22,11 @@ public:
 	void IssuesDelete(string);
 	void StatusUpdate(string, string);
 	void NewComplain();
-	void ServiceHistory();
+	void ServiceHistory(string,string);
 	void Submit();
 	void Issues(string);
-	void Employee_Status_Update(string, string);
+	void Employee_Status_Update(string,string);
+	string CustomerSearch(string);
 };
 
 
@@ -242,17 +243,19 @@ void CarService::Employee() {
 				cout << date << "|" << time << "|" << VehicleNo << "|" << Issues << "$" << endl;
 			}
 		}
-
+		cout << "Enter the vehicle number to select the vehicle:";
+		cin >> key;
+		StatusUpdate(key, "1");
+		cout << "status up";
+		Employee_Status_Update(userName, "1");
+		ServiceHistory(key,userName);
 	}
 	else
 	{
 		cout << "login not successfull  ";
 		Employee();
 	}
-	cout << "Enter the vehicle number to select the vehicle:";
-	cin >> key;
-	StatusUpdate(key, "1");
-	Employee_Status_Update(userName, "1");
+	
 }
 
 string CarService::Employee_search(string key)
@@ -468,7 +471,6 @@ void CarService::AlreadyCust() {
 		while (buffer[i] != '$')
 			VehicleNo += buffer[i++];
 
-
 		if (VehicleNo == key)
 		{
 			cout << "\nFound the Vehicle Number.\n" << buffer;
@@ -482,8 +484,8 @@ void CarService::AlreadyCust() {
 				switch (choice) {
 				case 1: Issues(VehicleNo);
 					break;
-				case 2: ServiceHistory();
-					break;
+				//case 2: View_ServiceHistory();
+					//break;
 				case 3: AlreadyCust();
 					break;
 
@@ -534,15 +536,86 @@ void CarService::NewCust() {
 		NewCust();
 	}
 }
-void CarService::ServiceHistory() {
+void CarService::ServiceHistory(string key,string employee_ID) 
+{
+	string buffer, date, time, customerName, VehicleNo, Issues, status, amount, payment;
+	int pos = 0, i = 0;
+	fstream ServiceHistory("ServiceHistory.txt",ios::app);
+	fstream CustomerDetails;
+	CustomerDetails.open("CustomerDetails.txt", ios::in);
+	fstream IssuesDetails("IssueDetails.txt", ios::in);
+	buffer = IssuesSearch(key);
+	customerName = CustomerSearch(key);
+	if (buffer == "NULL" ||customerName=="NULL") {
+		cout << "not found" << endl;
+	}
+	else {
+		i = 0;
+		date.erase();
+		while (buffer[i] != '|')
+			date += buffer[i++];
+		time.erase();
+		i++;
+		while (buffer[i] != '|')
+			time += buffer[i++];
+		VehicleNo.erase();
+		i++;
+		while (buffer[i] != '|')
+			VehicleNo += buffer[i++];
+		Issues.erase();
+		i++;
+		while (buffer[i] != '|')
+			Issues += buffer[i++];
+		status.erase();
+		i++;
+		while (buffer[i] != '$')
+			status += buffer[i++];
+		payment = "0";
+		ServiceHistory << date << "|" << time << "|" << VehicleNo << "|" << customerName << "|" << Issues <<"|"<<employee_ID <<"|" << status << "|" << payment << "$" << endl;
+	}
+	
 
 }
+
+string CarService::CustomerSearch(string key)
+{
+	int flag = 0, pos = 0, choice;
+	string VehicleNo, name, confirm, buffer;
+	string PhoneNumber;
+	ifstream CustomerDetails;
+	CustomerDetails.open("CustomerDetails.txt", ios::in);
+	while (!CustomerDetails.eof())
+	{
+		buffer.erase();
+		pos = CustomerDetails.tellg();
+		if (!getline(CustomerDetails, buffer))
+			break;
+		int i = 0;
+		name.erase();
+		while (buffer[i] != '|')
+			name += buffer[i++];
+		PhoneNumber.erase();
+		i++;
+		while (buffer[i] != '|')
+			PhoneNumber += buffer[i++];
+		VehicleNo.erase();
+		i++;
+		while (buffer[i] != '$')
+			VehicleNo += buffer[i++];
+
+		if (VehicleNo == key)
+		{
+			return name;
+		}
+	}
+	return "NULL";
+}
+
 void CarService::Issues(string vehicle_numb) {
 	string status = "0";
 	string issues, wax_wash, confirm;
 	SYSTEMTIME st;
 	GetSystemTime(&st);
-
 
 	ofstream CarIssues("IssuesDetails.txt", ios::app);
 	cout << "Enter the Issues in your Vehicle:";
